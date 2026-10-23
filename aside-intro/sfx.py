@@ -247,7 +247,7 @@ def reverb(x, amount, length=1.4, decay_rate=4.0):
     return x + wet * amount * np.max(np.abs(x)) / (np.max(np.abs(wet)) + 1e-9)
 
 
-mix = reverb(fx, 0.22) + reverb(music, 0.12) * 0.75
+mix = reverb(fx, 0.22)  # 배경음악(music)은 빼고 효과음만
 
 # 충격적입니다 직전 0.25초는 잔향까지 완전히 비움
 g0, g1 = int((T['shock'] - gap) * SR), int(T['shock'] * SR) - 30

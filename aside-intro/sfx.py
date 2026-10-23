@@ -115,25 +115,26 @@ def mystery(dur):
     return low + shimmer
 
 
-# 초반: 지지직 글리치로 시선 잡기 → 미쳤습니다에 빨려들어가는 소리 + 강한 한 방
-add(glitch(), 0.0, 0.55)
-add(reverse_swell(0.5), 0.25, 0.7)
-add(stab([110, 164.8, 220], 0.9, 4.5), 0.75, 0.75)
-add(whoosh(0.3, 2000, 9000), 0.62, 0.5)
+def ding(f, dur=1.0):
+    # 띠링: 종소리처럼 배음 섞인 사인파
+    n = int(dur * SR)
+    t = np.arange(n) / SR
+    s = (np.sin(2 * np.pi * f * t) + 0.35 * np.sin(2 * np.pi * f * 2 * t) * np.exp(-t * 4)
+         + 0.15 * np.sin(2 * np.pi * f * 2.76 * t) * np.exp(-t * 7))
+    return s * np.exp(-t * 3.5) * np.minimum(1, t / 0.003)
 
-# 충격적입니다 / 1~3단계는 휙
+
 # whoosh 는 가운데가 가장 크므로 장면 시점보다 dur/2 먼저 시작
 def swoosh(at, dur, gain, lo=300, hi=5000):
     add(whoosh(dur, lo, hi), at - dur / 2, gain)
 
 
-swoosh(6.8, 0.6, 1.0, 200, 4000)             # 충격적입니다
-for i, at in enumerate([7.8, 8.3, 8.75]):    # 1~3단계, 점점 크게
+add(boom(), 0.75, 1.0)                       # 미쳤습니다: 쿵
+add(boom(1.0, 160, 34, 3.0), 6.8, 1.0)       # 충격적입니다: 쿵
+for i, at in enumerate([7.8, 8.3, 8.75]):    # 1~3단계: 휙, 점점 크게
     swoosh(at + 0.08, 0.32, 0.5 + i * 0.12, 500, 7000)
-
-# 4단계 ???: 빨려 들어가다가 불길한 화음
-add(reverse_swell(0.4), 8.75, 0.6)
-add(mystery(0.85), 9.15, 0.8)
+add(ding(659.3), 9.15, 0.45)                 # 4단계: 띠-링 (피치 살짝 낮춤, E5 → A5)
+add(ding(880.0, 0.85), 9.27, 0.5)
 
 # 마스터: 소프트 리미터, -1 dBFS
 out = np.tanh(out * 1.2)

@@ -38,13 +38,17 @@
   #s4 .l2 { top: 470px; font-size: 200px; }
 
   /* 5. 1~4단계 */
-  #s5 .dots { position: absolute; top: 110px; left: 0; right: 0; display: flex; justify-content: center; gap: 28px; }
-  #s5 .dot { width: 120px; height: 14px; border-radius: 7px; background: #dcdfe0; }
-  #s5 .dot.on { background: var(--black); }
-  #s5 .dot.on.last { background: var(--red); }
-  #s5 .step { position: absolute; top: 250px; left: 0; right: 0; text-align: center; font-size: 220px; opacity: 0; }
-  #s5 .q { position: absolute; top: 560px; left: 0; right: 0; text-align: center; font-size: 230px; opacity: 0; }
-  /* 단계 아래 y≈560~900 영역은 할 일 텍스트를 직접 넣을 수 있도록 비워둠 */
+  /* 한 화면 4분할(2x2). 각 칸 960x540, 단계 글씨 아래 칸 가운데는 할 일을 넣을 수 있게 비워둠 */
+  #s5 .cell { position: absolute; width: 960px; height: 540px; opacity: 0; }
+  #s5 .cell[data-i="0"] { left: 0; top: 0; }
+  #s5 .cell[data-i="1"] { left: 960px; top: 0; }
+  #s5 .cell[data-i="2"] { left: 0; top: 540px; }
+  #s5 .cell[data-i="3"] { left: 960px; top: 540px; }
+  #s5 .step { position: absolute; top: 40px; left: 0; right: 0; text-align: center; font-size: 96px; }
+  #s5 .cell[data-i="3"] .step { color: var(--red); }
+  #s5 .q { position: absolute; top: 190px; left: 0; right: 0; text-align: center; font-size: 220px; opacity: 0; }
+  #s5 .vline { position: absolute; left: 957px; top: 0; width: 6px; height: 1080px; background: var(--black); transform-origin: top; }
+  #s5 .hline { position: absolute; top: 537px; left: 0; height: 6px; width: 1920px; background: var(--black); transform-origin: left; }
 </style>
 </head>
 <body>
@@ -66,12 +70,12 @@
     <div class="line l2 red">충격적입니다</div>
   </div>
   <div class="scene" id="s5">
-    <div class="dots"><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot last"></div></div>
-    <div class="step" data-i="0">1단계</div>
-    <div class="step" data-i="1">2단계</div>
-    <div class="step" data-i="2">3단계</div>
-    <div class="step" data-i="3">4단계</div>
-    <div class="q red">???</div>
+    <div class="cell" data-i="0"><div class="step">1단계</div></div>
+    <div class="cell" data-i="1"><div class="step">2단계</div></div>
+    <div class="cell" data-i="2"><div class="step">3단계</div></div>
+    <div class="cell" data-i="3"><div class="step">4단계</div><div class="q red">???</div></div>
+    <div class="vline"></div>
+    <div class="hline"></div>
   </div>
 </div>
 
@@ -144,19 +148,19 @@ function render(t) {
   [x, y] = shake(t, T.s4Shock + 0.18, 40, 0.6);
   s4.style.transform = `translate(${x}px, ${y}px)`;
 
-  // 5: 단계마다 점점 세게
+  // 5: 4분할 화면, 칸이 하나씩 채워지며 점점 세게
   const s5 = $('#s5');
   s5.style.opacity = sceneAlpha(t, T.s5, 0.04);
+  const lk = easeOut(prog(t, T.s5[0], 0.2));
+  $('#s5 .vline').style.transform = `scaleY(${lk})`;
+  $('#s5 .hline').style.transform = `scaleX(${lk})`;
   let cur = -1;
   T.steps.forEach((st, i) => { if (t >= st) cur = i; });
-  document.querySelectorAll('#s5 .dot').forEach((d, i) => d.classList.toggle('on', i <= cur));
-  document.querySelectorAll('#s5 .step').forEach((el, i) => {
-    if (i !== cur) { el.style.opacity = 0; return; }
+  document.querySelectorAll('#s5 .cell').forEach((el, i) => {
     const k = prog(t, T.steps[i], 0.18);
-    const from = 1.5 + i * 0.35;          // 뒤로 갈수록 더 크게 박힘
-    el.style.opacity = clamp(k * 3);
-    el.style.transform = `scale(${from + (1 - from) * easeOut(k)})`;
-    el.style.color = i === 3 ? 'var(--red)' : 'var(--black)';
+    const from = 1.5 + i * 0.3;           // 뒤로 갈수록 더 크게 박힘
+    el.style.opacity = t < T.steps[i] ? 0 : clamp(k * 3);
+    el.querySelector('.step').style.transform = `scale(${from + (1 - from) * easeOut(k)})`;
   });
   const q = $('#s5 .q');
   const qs = T.steps[3] + 0.12;

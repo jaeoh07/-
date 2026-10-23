@@ -8,6 +8,7 @@ const FPS = 30;
   const browser = await chromium.launch();
   const page = await browser.newPage({ viewport: { width: 1920, height: 1080 } });
   await page.goto('file://' + path.join(__dirname, 'intro.html') + '?render');
+  await page.evaluate(() => Promise.all([...document.fonts].map((f) => f.load().catch(() => {}))));
   await page.evaluate(() => document.fonts.ready);
   await page.waitForTimeout(300);
   const dur = await page.evaluate(() => window.DURATION);

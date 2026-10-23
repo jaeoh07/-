@@ -10,7 +10,6 @@
     --red: #FF1E2D;
     --white: #FFFFFF;
     --bg: #050505;
-    --green: #2EE59D;
   }
   * { margin: 0; padding: 0; box-sizing: border-box; }
   html, body { width: 1920px; height: 1080px; overflow: hidden; background: var(--bg); }
@@ -32,7 +31,6 @@
   #wall { position: absolute; left: 50%; top: 50%; width: 1912px; height: 1112px; margin: -556px 0 0 -956px;
           display: grid; grid-template-columns: repeat(4, 460px); grid-auto-rows: 260px; gap: 24px; }
   .win { background: #121316; border: 2px solid #26282d; border-radius: 16px; overflow: hidden; position: relative; opacity: 0; }
-  .win.done { border-color: var(--green); box-shadow: 0 0 24px rgba(46, 229, 157, 0.35); }
   .win .bar { height: 40px; background: #1b1d21; display: flex; align-items: center; gap: 8px; padding: 0 14px; }
   .win .dot { width: 12px; height: 12px; border-radius: 6px; background: #3a3d44; }
   .win .url { margin-left: 10px; flex: 1; height: 24px; border-radius: 12px; background: #0c0d0f; font-size: 15px; line-height: 24px; padding: 0 12px; color: #9aa0a8; }
@@ -40,9 +38,9 @@
   .win .sk { position: absolute; left: 22px; height: 12px; border-radius: 6px; background: #24272c; }
   .win .prog { position: absolute; left: 22px; right: 22px; bottom: 54px; height: 10px; border-radius: 5px; background: #24272c; overflow: hidden; }
   .win .prog i { display: block; height: 100%; width: 0; background: var(--red); }
-  .win.done .prog i { background: var(--green); }
+  .win.done .prog i { background: #fff; }
   .win .st { position: absolute; left: 22px; bottom: 16px; font-size: 22px; color: #9aa0a8; }
-  .win.done .st { color: var(--green); }
+  .win.done .st { color: #fff; }
   .win .cur { position: absolute; width: 34px; height: 34px; }
   #s2 .band { position: absolute; left: 0; right: 0; top: 300px; height: 500px;
               background: linear-gradient(transparent, rgba(0,0,0,0.88) 22%, rgba(0,0,0,0.88) 78%, transparent); }
@@ -64,7 +62,7 @@
   #s4 .m1 { top: 330px; font-size: 110px; }
   #s4 .m2 { top: 470px; font-size: 230px; line-height: 1.1; }
   #s4 .shock { top: 360px; font-size: 300px; line-height: 1.1; }
-  #pulse { position: absolute; inset: 0; background: radial-gradient(ellipse at center, transparent 35%, rgba(255,0,20,0.75) 100%); opacity: 0; }
+  #pulse { position: absolute; inset: 0; background: radial-gradient(ellipse at center, transparent 35%, rgba(0,0,0,0.85) 100%); opacity: 0; }
 
   /* 5. 세로 4분할: 1~4단계 (slot 칸에 직접 영상/글을 넣으면 됨) */
   #s5 .col { position: absolute; top: 0; width: 480px; height: 1080px; background: #0a0a0b; }
@@ -72,7 +70,7 @@
   #s5 .slot { position: absolute; top: 230px; left: 30px; right: 30px; bottom: 130px; border-radius: 20px;
               border: 3px solid rgba(255,255,255,0.12); background: #111214; }
   #s5 .col.last .lab { color: var(--red); }
-  #s5 .col.last .slot { border-color: var(--red); background: #160608; box-shadow: inset 0 0 80px rgba(255,30,45,0.25); }
+  #s5 .col.last .slot { border-color: var(--red); background: #111214; }
   #s5 .q { position: absolute; left: 0; right: 0; top: 50%; margin-top: -150px; text-align: center; font-size: 250px; line-height: 1.2; color: var(--red); }
   #s5 .warn { position: absolute; bottom: 45px; left: 0; right: 0; text-align: center; font-size: 46px; opacity: 0; }
   #s5 .vline { position: absolute; top: 0; width: 5px; height: 1080px; background: #2a2b2f; }
@@ -82,7 +80,7 @@
 
   /* 오버레이 */
   #glitch { position: absolute; inset: 0; pointer-events: none; }
-  #glitch div { position: absolute; left: 0; width: 100%; mix-blend-mode: difference; display: none; }
+  #glitch div { position: absolute; left: 0; width: 100%; display: none; }
   #flash { position: absolute; inset: 0; background: #fff; opacity: 0; }
   #grain { position: absolute; inset: 0; width: 1920px; height: 1080px; opacity: 0.09; mix-blend-mode: screen; }
   #vig { position: absolute; inset: 0; background: radial-gradient(ellipse at center, transparent 55%, rgba(0,0,0,0.65) 100%); }
@@ -151,11 +149,10 @@ const T = {
   s6: [11.45, 12.0],
   end: 12.0,
 };
-const GLITCH = [[0.0, 0.28, 1], [1.62, 1.76, 0.8], [4.33, 4.44, 0.7], [7.5, 7.78, 1], [9.78, 9.96, 0.9], [11.36, 11.52, 1]];
-const FLASH = [[T.s1Crazy, 0.9], [T.s2B, 0.5], [T.s2C, 0.5], [T.nums[3], 0.7], [T.s4Shock, 1], [T.cols[3], 0.6], [T.s6[0] + 0.08, 0.6]];
-const SHAKE = [[T.s1Crazy, 34, 0.5], [T.s2B, 18, 0.3], [T.s2C, 22, 0.35], [T.nums[3], 30, 0.45], [T.s4Shock, 52, 0.8],
-               [T.cols[0], 10, 0.25], [T.cols[1], 14, 0.25], [T.cols[2], 18, 0.25], [T.cols[3], 34, 0.5]];
-const PUNCH = [[T.s1Crazy, 0.08], [T.s2C, 0.05], [T.nums[3], 0.07], [T.s4Shock, 0.1], [T.cols[3], 0.04]];
+const GLITCH = [[0.0, 0.28, 1], [1.62, 1.76, 0.8], [4.33, 4.44, 0.7], [7.5, 7.78, 1], [11.36, 11.52, 1]];
+const FLASH = [[T.s1Crazy, 0.9], [T.s2B, 0.5], [T.s2C, 0.5], [T.s4Shock, 1], [T.s6[0] + 0.08, 0.6]];
+const SHAKE = [[T.s1Crazy, 34, 0.5], [T.s2B, 18, 0.3], [T.s2C, 22, 0.35], [T.s4Shock, 30, 0.6]];
+const PUNCH = [[T.s1Crazy, 0.08], [T.s2C, 0.05], [T.s4Shock, 0.07]];
 
 const $ = (s, r = document) => r.querySelector(s);
 const $$ = (s, r = document) => [...r.querySelectorAll(s)];
@@ -182,10 +179,6 @@ function rise(el, t, at, dist = 50, dur = 0.25) {
   el.style.transform = `translateY(${(1 - k) * dist}px)`;
 }
 function hide(el) { el.style.opacity = 0; }
-// RGB 분리(색수차)
-function rgb(el, d) {
-  el.style.textShadow = d < 0.5 ? '' : `${-d}px 0 rgba(255,0,64,0.9), ${d}px 0 rgba(0,240,255,0.9)`;
-}
 function glitchAmt(t) {
   let g = 0;
   for (const [a, b, s] of GLITCH) if (t >= a && t < b) g = Math.max(g, s);
@@ -238,7 +231,6 @@ function render(t) {
   s1logo.style.filter = `invert(1) blur(${t < T.s1Crazy ? 0 : 6}px)`;
   rise($('#s1 .l1'), t, T.s1L1);
   slam($('#s1 .l2'), t, T.s1Crazy, 3.2);
-  rgb($('#s1 .l2'), 14 * decay(t, T.s1Crazy, 0.4) + 3);
 
   // 2. 몽타주
   const wk = prog(t, T.s2[0], T.s2[1] - T.s2[0]);
@@ -262,7 +254,6 @@ function render(t) {
   });
   rise($('#s2 .a'), t, T.s2[0] + 0.12);
   slam($('#s2 .b'), t, T.s2B, 2.4);
-  rgb($('#s2 .b'), 10 * decay(t, T.s2B, 0.3));
   if (t >= T.s2C) { hide($('#s2 .a')); hide($('#s2 .b')); }
   slam($('#s2 .c'), t, T.s2C, 2.2);
 
@@ -272,9 +263,11 @@ function render(t) {
   $$('#s3 .num').forEach((el, i) => {
     const next = T.nums[i + 1] ?? Infinity;
     if (t < T.nums[i] || t >= next) { hide(el); return; }
-    slam(el, t, T.nums[i], i === 3 ? 2.2 : 1.6, i === 3 ? 0.2 : 0.12);
+    if (i < 3) { slam(el, t, T.nums[i], 1.6, 0.12); return; }
+    const k = easeOut(prog(t, T.nums[i], 0.28));   // 4 는 오른쪽에서 쓱
+    el.style.opacity = k;
+    el.style.transform = `translateX(${(1 - k) * 420}px)`;
   });
-  rgb($('#s3 .four'), 16 * decay(t, T.nums[3], 0.4));
   rise($('#s3 .bottom'), t, T.s3Bottom);
 
   // 4. 충격적입니다
@@ -286,8 +279,6 @@ function render(t) {
     rise($('#s4 .m2'), t, T.s4M2, 30, 0.2);
   } else { hide($('#s4 .m1')); hide($('#s4 .m2')); }
   slam($('#s4 .shock'), t, T.s4Shock, 3.6, 0.22);
-  const jitter = t > T.s4Shock + 0.3 ? 3 : 0;
-  rgb($('#s4 .shock'), 22 * decay(t, T.s4Shock, 0.6) + 4 + jitter * rnd(frame, 5));
   let pulse = T.beats.reduce((m, b) => Math.max(m, decay(t, b, 0.22)), 0);
   if (!before) pulse = 0.5 + 0.15 * Math.sin(t * 9);
   $('#pulse').style.opacity = pulse;
@@ -299,11 +290,8 @@ function render(t) {
     el.style.transform = `translateY(${(1 - k) * (i % 2 ? 1100 : -1100)}px)`;
   });
   const q = $('#s5 .q');
-  const qg = t > T.cols[3] ? (rnd(frame, 7) > 0.8 ? 1 : 0) : 0;
-  q.style.transform = `translateX(${qg * (rnd(frame, 8) - 0.5) * 40}px) scale(${1 + 0.05 * Math.pow(Math.sin(t * 7.5), 8)})`;
-  rgb(q, 8 + 18 * qg);
-  const warn = $('#s5 .warn');
-  warn.style.opacity = t < T.warn ? 0 : (Math.floor((t - T.warn) * 4) % 2 === 0 ? 1 : 0.35);
+  q.style.transform = `scale(${1 + 0.04 * Math.pow(Math.sin(t * 4), 8)})`;
+  rise($('#s5 .warn'), t, T.warn, 20, 0.3);
 
   // 6. 엔딩 로고
   const lk = prog(t, T.s6[0] + 0.08, 0.3);
@@ -323,7 +311,7 @@ function render(t) {
   const skew = g ? (rnd(frame, 12) - 0.5) * 8 * g : 0;
   const stage = $('#stage');
   stage.style.transform = `translate(${sx + gx}px, ${sy}px) scale(${1 + punch}) skewX(${skew}deg)`;
-  stage.style.filter = g ? `contrast(${1 + 0.6 * g}) hue-rotate(${(rnd(frame, 13) - 0.5) * 90 * g}deg)` : '';
+  stage.style.filter = g ? `contrast(${1 + 0.6 * g})` : '';
 
   $$('#glitch div').forEach((d, i) => {
     if (!g || rnd(frame, i + 20) < 0.35) { d.style.display = 'none'; return; }
@@ -331,7 +319,7 @@ function render(t) {
     d.style.top = rnd(frame, i + 40) * 1080 + 'px';
     d.style.height = 4 + rnd(frame, i + 60) * 70 + 'px';
     d.style.left = (rnd(frame, i + 80) - 0.5) * 200 + 'px';
-    d.style.background = ['#ff1e2d', '#00f0ff', '#ffffff'][i % 3];
+    d.style.background = i % 2 ? '#000' : '#fff';
   });
 
   $('#flash').style.opacity = FLASH.reduce((m, [at, a]) => Math.max(m, a * decay(t, at, 0.14)), 0);

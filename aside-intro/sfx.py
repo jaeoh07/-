@@ -186,35 +186,30 @@ add(boom(0.7, 160, 45, 5), T['s2C'], 0.75)
 add(reverse_swell(0.5), T['s3'] - 0.5, 0.5)
 add(glitch(0.11), 4.33, 0.45)
 
-# ── 3. 카운트 1-2-3 → 4 쾅
+# ── 3. 카운트 1-2-3 → 4 는 쓱
 for i, at in enumerate(T['nums'][:3]):
     add(tick(900 + i * 250, 0.1), at, 0.6)
     add(boom(0.25, 130, 60, 14), at, 0.4)
-impact(T['nums'][3], 0.75)
+add(whoosh(0.3, 1500, 9000), T['nums'][3] - 0.12, 0.75)  # 쓱
 
 # ── 4. 모든 소리 빠지고(정적) 심장박동 → 충격적입니다 초대형 쾅
 add(sub_drop(1.2), T['s4'], 0.3)
 for i, at in enumerate(T['beats']):
     add(heartbeat(), at, 0.4 + i * 0.08)
 add(reverse_swell(0.6), T['shock'] - 0.6, 1.0)
-impact(T['shock'], 1.25)
+impact(T['shock'], 1.0)
 add(glitch(0.28), T['shock'], 0.5)
 add(sub_drop(1.2), T['shock'] + 0.05, 0.6)
 
-# ── 5. 1~3단계 휙 → 4단계 쾅 + 삐- → 째깍째깍 → 엔딩 띠링
+# ── 5. 1~4단계 휙, 4단계만 띠링으로 살짝 강조 → 엔딩
 for i, at in enumerate(T['cols'][:3]):
     add(whoosh(0.32, 500, 7000), at - 0.1, 0.55 + i * 0.12)
     add(boom(0.35, 150 + i * 20, 55, 10), at + 0.05, 0.3 + i * 0.08)
-add(whoosh(0.4, 300, 6000), T['cols'][3] - 0.15, 0.8)
-impact(T['cols'][3], 0.8)
-add(glitch(0.18), T['cols'][3], 0.45)
-add(beep(0.6), T['cols'][3] + 0.08, 1.0)
-for i, at in enumerate(np.arange(10.5, 11.4, 0.225)):
-    add(clock(2200 if i % 2 == 0 else 1700), at, 0.45)
-add(glitch(0.16), 11.36, 0.55)
-impact(T['s6'], 0.7)
-add(ding(659.3), T['s6'] + 0.08, 0.45)
-add(ding(880.0, 0.5), T['s6'] + 0.2, 0.5)
+add(whoosh(0.32, 500, 7000), T['cols'][3] - 0.1, 0.85)
+add(ding(659.3), T['cols'][3] + 0.1, 0.45)          # 띠-링 (피치 살짝 낮춤)
+add(ding(880.0, 0.9), T['cols'][3] + 0.22, 0.5)
+add(glitch(0.16), 11.36, 0.45)
+impact(T['s6'], 0.6)
 
 # 리버브(간단한 컨볼루션)로 공간감
 ir_t = env_t(1.1)

@@ -38,17 +38,12 @@
   #s4 .l2 { top: 470px; font-size: 200px; }
 
   /* 5. 1~4단계 */
-  /* 한 화면 4분할(2x2). 각 칸 960x540, 단계 글씨 아래 칸 가운데는 할 일을 넣을 수 있게 비워둠 */
-  #s5 .cell { position: absolute; width: 960px; height: 540px; opacity: 0; }
-  #s5 .cell[data-i="0"] { left: 0; top: 0; }
-  #s5 .cell[data-i="1"] { left: 960px; top: 0; }
-  #s5 .cell[data-i="2"] { left: 0; top: 540px; }
-  #s5 .cell[data-i="3"] { left: 960px; top: 540px; }
-  #s5 .step { position: absolute; top: 40px; left: 0; right: 0; text-align: center; font-size: 96px; }
+  /* 한 화면 세로 4분할. 각 칸 480x1080, 단계 글씨 아래는 할 일을 넣을 수 있게 비워둠 */
+  #s5 .cell { position: absolute; top: 0; width: 480px; height: 1080px; opacity: 0; }
+  #s5 .step { position: absolute; top: 70px; left: 0; right: 0; text-align: center; font-size: 88px; }
   #s5 .cell[data-i="3"] .step { color: var(--red); }
-  #s5 .q { position: absolute; top: 190px; left: 0; right: 0; text-align: center; font-size: 220px; opacity: 0; }
-  #s5 .vline { position: absolute; left: 957px; top: 0; width: 6px; height: 1080px; background: var(--black); transform-origin: top; }
-  #s5 .hline { position: absolute; top: 537px; left: 0; height: 6px; width: 1920px; background: var(--black); transform-origin: left; }
+  #s5 .q { position: absolute; top: 430px; left: 0; right: 0; text-align: center; font-size: 170px; opacity: 0; }
+  #s5 .vline { position: absolute; top: 0; width: 6px; height: 1080px; background: var(--black); transform-origin: top; }
 </style>
 </head>
 <body>
@@ -70,12 +65,13 @@
     <div class="line l2 red">충격적입니다</div>
   </div>
   <div class="scene" id="s5">
-    <div class="cell" data-i="0"><div class="step">1단계</div></div>
-    <div class="cell" data-i="1"><div class="step">2단계</div></div>
-    <div class="cell" data-i="2"><div class="step">3단계</div></div>
-    <div class="cell" data-i="3"><div class="step">4단계</div><div class="q red">???</div></div>
-    <div class="vline"></div>
-    <div class="hline"></div>
+    <div class="cell" data-i="0" style="left: 0"><div class="step">1단계</div></div>
+    <div class="cell" data-i="1" style="left: 480px"><div class="step">2단계</div></div>
+    <div class="cell" data-i="2" style="left: 960px"><div class="step">3단계</div></div>
+    <div class="cell" data-i="3" style="left: 1440px"><div class="step">4단계</div><div class="q red">???</div></div>
+    <div class="vline" style="left: 477px"></div>
+    <div class="vline" style="left: 957px"></div>
+    <div class="vline" style="left: 1437px"></div>
   </div>
 </div>
 
@@ -148,19 +144,15 @@ function render(t) {
   [x, y] = shake(t, T.s4Shock + 0.18, 40, 0.6);
   s4.style.transform = `translate(${x}px, ${y}px)`;
 
-  // 5: 4분할 화면, 칸이 하나씩 채워지며 점점 세게
+  // 5: 세로 4분할 화면, 칸이 왼쪽부터 하나씩 휙 내려옴
   const s5 = $('#s5');
   s5.style.opacity = sceneAlpha(t, T.s5, 0.04);
   const lk = easeOut(prog(t, T.s5[0], 0.2));
-  $('#s5 .vline').style.transform = `scaleY(${lk})`;
-  $('#s5 .hline').style.transform = `scaleX(${lk})`;
-  let cur = -1;
-  T.steps.forEach((st, i) => { if (t >= st) cur = i; });
+  document.querySelectorAll('#s5 .vline').forEach((el) => { el.style.transform = `scaleY(${lk})`; });
   document.querySelectorAll('#s5 .cell').forEach((el, i) => {
-    const k = prog(t, T.steps[i], 0.18);
-    const from = 1.5 + i * 0.3;           // 뒤로 갈수록 더 크게 박힘
-    el.style.opacity = t < T.steps[i] ? 0 : clamp(k * 3);
-    el.querySelector('.step').style.transform = `scale(${from + (1 - from) * easeOut(k)})`;
+    const k = easeOut(prog(t, T.steps[i], 0.22));
+    el.style.opacity = t < T.steps[i] ? 0 : k;
+    el.style.transform = `translateY(${(1 - k) * -160}px)`;
   });
   const q = $('#s5 .q');
   const qs = T.steps[3] + 0.12;
@@ -168,9 +160,6 @@ function render(t) {
   // ??? 는 박힌 뒤 심장박동처럼 계속 뛰게
   const beat = t < qs + 0.2 ? easeOutBack(prog(t, qs, 0.2)) * 1 : 1 + 0.05 * Math.pow(Math.sin((t - qs) * Math.PI * 2.4), 8);
   q.style.transform = `scale(${t < qs + 0.2 ? 0.3 + 0.7 * beat : beat})`;
-  const amp = cur < 0 ? 0 : 10 + cur * 14;
-  [x, y] = shake(t, T.steps[Math.max(cur, 0)] + 0.1, amp, 0.35);
-  s5.style.transform = `translate(${x}px, ${y}px)`;
 }
 
 window.render = render;
